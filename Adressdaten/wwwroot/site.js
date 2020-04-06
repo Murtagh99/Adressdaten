@@ -14,8 +14,8 @@
 }
 
 function readInput(indicator) {
-    let city = document.getElementById("inputCity").value;
-    let street = document.getElementById("inputStreet").value;
+    let city = document.getElementById("inputcities").value;
+    let street = document.getElementById("inputstreets").value;
     let matching = city.match(/^\d+/);
     let url = "api/adressdaten";
 
@@ -39,7 +39,16 @@ function readInput(indicator) {
 
 async function getOptions(indicator, listId) {
     let AdressItemArray = await getAddress(indicator);
-    let list = document.getElementById(listId);
-    list.innerHTML = "";
-    AdressItemArray.forEach(Item => list.appendChild(document.createElement("option")).setAttribute("value", Item.postCode + " " + Item.name));
+    const list = document.getElementById(listId);
+    const oldItemsLength = list.childElementCount;
+    if (!list.firstChild || !(document.getElementById("input" + listId).innerHTML === list.firstChild.innerHTML)) {
+        if (indicator) {
+            AdressItemArray.forEach(Item => list.appendChild(document.createElement("option")).setAttribute("value", Item.name));
+        } else {
+            AdressItemArray.forEach(Item => list.appendChild(document.createElement("option")).setAttribute("value", Item.postCode + " " + Item.name));
+        }
+        for (i = 0; i < oldItemsLength; i++) {
+            list.removeChild(list.firstChild);
+        }
+    }
 }
