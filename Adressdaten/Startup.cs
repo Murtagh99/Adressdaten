@@ -53,10 +53,10 @@ namespace Adressdaten
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
-            {
-                app.UseHsts();
-            }
+            //else
+            //{
+            //    app.UseHsts();
+            //}
 
             app.UseSwagger();
             app.UseSwaggerUI(c =>
