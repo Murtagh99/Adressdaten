@@ -48,5 +48,11 @@ namespace Adressdaten.Controllers
             return await AdressdatenItem.ToListAsync();
         }
 
+        [HttpGet("Streeta")]
+        public async Task<ActionResult<IList<Street>>> GetStreeta([FromQuery]Street street)
+        {
+            var AdressdatenItem = _context.Streets.Where(s => s.PostCodeFK.ToString().Contains(street.PostCodeFK.ToString()) && s.Name.ToLower().StartsWith(street.Name.ToLower()));
+            return await AdressdatenItem.ToListAsync();
+        }
     }
 }
