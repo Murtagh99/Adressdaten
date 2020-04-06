@@ -1,12 +1,14 @@
-﻿async function getAddress(indicator) {
-    $.ajax({
-        type: "GET",
-        url: await readInput(indicator),
-        cache: false,
-        success: function (data) {
-            console.log(data);
-            return data;
-        }
+﻿function getAddress(indicator) {
+    return new Promise(resolve => {
+        $.ajax({
+            type: "GET",
+            url: readInput(indicator),
+            cache: false,
+            success: function (data) {
+                console.log(data);
+                resolve(data);
+            }
+        })
     })
 
 }
@@ -33,4 +35,11 @@ function readInput(indicator) {
         url = url.concat("/norequest")
     }
     return url;
+}
+
+async function getOptions(indicator, listId) {
+    let AdressItemArray = await getAddress(indicator);
+    let list = document.getElementById(listId);
+    list.innerHTML = "";
+    AdressItemArray.forEach(Item => list.appendChild(document.createElement("option")).setAttribute("value", Item.postCode + " " + Item.name));
 }

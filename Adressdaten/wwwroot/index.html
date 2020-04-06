@@ -6,9 +6,9 @@
     <title>best API ever</title>
 </head>
 <body>
-    <h1>Hier findest du alles</h1>
     <!--<label for="inputCity">Plz oder Ort</label>-->
-    <input type="text" id="inputCity" oninput="getAddress(false)" placeholder="Plz oder Ort"/>
+    <input type="text" id="inputCity" oninput="getOptions(false, 'cities')" placeholder="Plz oder Ort" list="cities" onfocus="getOptions(false, 'cities')"/>
+    <datalist id="cities"></datalist>
     <!--<label for="inputStreet">Street</label>-->
     <input type="text" id="inputStreet" oninput="getAddress(true)" placeholder="Strasse"/>
     
@@ -20,7 +20,6 @@
         body {
             display: flex;
             flex-direction: column ;
-            background-color: mediumvioletred;
         }
         input {
             width: 20em;
@@ -35,13 +34,6 @@
         input:focus{
             border-color:dodgerblue;
             box-shadow:0 0 8px 0 dodgerBlue;
-
-        }
-
-        input:hover {
-            -webkit-transform: rotateZ(-30deg);
-            -ms-transform: rotateZ(-30deg);
-            transform: rotateZ(-30deg);
         }
     </style>
 </body>

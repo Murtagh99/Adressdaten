@@ -18,27 +18,12 @@ namespace Adressdaten
         public static void Main(string[] args)
         {
 
-            string dbName = "Adress.db";
-            if (File.Exists(dbName))
-            {
-                File.Delete(dbName);
-            }
-            using (var dbContext = new AdressdatenContext())
-            {
-                dbContext.Database.EnsureCreated();
-                var importedCities = JsonConvert.DeserializeObject<ImportCity[]>(File.ReadAllText("Adressen/Cities.json"));
-                if (!dbContext.Cities.Any())
-                {
-                    dbContext.Cities.AddRange(importedCities.Select(city => new City { PostCode = city.PostCode, Name = city.Name }).ToArray());
-                    dbContext.SaveChanges();
-                }
-                if (!dbContext.Streets.Any())
-                {
-                    var streetsImport = importedCities.Select(city => city.Streets.Select(street => new Street { PostCodeFK = city.PostCode, Name = street.Name })).SelectMany(i => i);
-                    dbContext.Streets.AddRange(streetsImport.ToArray());
-                    dbContext.SaveChanges();
-                }
-            }
+            //string dbName = "Adress.db";
+            //if (File.Exists(dbName))
+            //{
+            //    File.Delete(dbName);
+            //}
+            
             CreateWebHostBuilder(args).Build().Run();
         }
 

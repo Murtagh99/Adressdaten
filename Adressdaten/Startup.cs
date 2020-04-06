@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Adressdaten.Models;
+using Newtonsoft.Json;
+using Adressdaten.Imports;
 
 namespace Adressdaten
 {
@@ -34,7 +36,7 @@ namespace Adressdaten
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<AdressdatenContext>();
+            services.AddDbContext<AdressdatenContext>(o => o.UseSqlite(Configuration.GetConnectionString("AdressDb")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(o => { o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore; });
         }
 
@@ -55,11 +57,27 @@ namespace Adressdaten
             app.UseHttpsRedirection();
             app.UseMvc();
 
-            //using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            //using (var context = scope.ServiceProvider.GetService<AdressdatenContext>())
+            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            using (var dbContext = scope.ServiceProvider.GetService<AdressdatenContext>())
             //{
             //    context.Database.EnsureCreated();
             //}
+            //using (var dbContext = new AdressdatenContext())
+            {
+                dbContext.Database.EnsureCreated();
+                var importedCities = JsonConvert.DeserializeObject<ImportCity[]>(System.IO.File.ReadAllText("Adressen/Cities.json"));
+                if (!dbContext.Cities.Any())
+                {
+                    dbContext.Cities.AddRange(importedCities.Select(city => new City { PostCode = city.PostCode, Name = city.Name }).ToArray());
+                    dbContext.SaveChanges();
+                }
+                if (!dbContext.Streets.Any())
+                {
+                    var streetsImport = importedCities.Select(city => city.Streets.Select(street => new Street { PostCodeFK = city.PostCode, Name = street.Name })).SelectMany(i => i);
+                    dbContext.Streets.AddRange(streetsImport.ToArray());
+                    dbContext.SaveChanges();
+                }
+            }
         }
     }
 }

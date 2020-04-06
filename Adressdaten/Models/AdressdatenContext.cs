@@ -1,5 +1,6 @@
 ﻿using Adressdaten.Imports;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,10 +11,10 @@ namespace Adressdaten.Models
 {
     public class AdressdatenContext : DbContext
     {
-        //public AdressdatenContext(DbContextOptions<AdressdatenContext> options)
-        //    : base(options)
-        //{
-        //}
+        public AdressdatenContext(DbContextOptions<AdressdatenContext> options)
+            : base(options)
+        {
+        }
 
         public AdressdatenContext() : base() { }
 
@@ -22,10 +23,10 @@ namespace Adressdaten.Models
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Filename=Adress.db", options =>
-            {
-                options.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
-            });
+            //optionsBuilder.UseSqlite(Configuration, options =>
+            //{
+            //    options.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName);
+            //});
             base.OnConfiguring(optionsBuilder);
         }
 
@@ -48,8 +49,6 @@ namespace Adressdaten.Models
                 //entity.HasIndex(e => e.Title).IsUnique();
                 //entity.Property(e => e.DateTimeAdd).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
-
-            base.OnModelCreating(modelBuilder);
 
             base.OnModelCreating(modelBuilder);
             //var importedCities = JsonConvert.DeserializeObject<ImportCity[]>(System.IO.File.ReadAllText("Adressen/Cities.json"));
