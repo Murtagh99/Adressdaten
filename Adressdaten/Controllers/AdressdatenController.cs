@@ -24,42 +24,29 @@ namespace Adressdaten.Controllers
         }
 
         [HttpGet("City")]
-        public async Task<ActionResult<IList<City>>> GetCities()
+        public async Task<ActionResult<IList<City>>> GetCities([FromQuery]City city)
         {
-            var AdressdatenItem = _context.Cities.Include(s => s.Streets);
-            return await AdressdatenItem.ToListAsync();
-        }
-        
-        [HttpGet("City/postcode={postcode}")]
-        public async Task<ActionResult<IList<City>>> GetAdressdatenItemPostCode(string postcode)
-        {
-            var AdressdatenItem = _context.Cities.Where(a => a.PostCode.ToString().StartsWith(postcode)).Include(s => s.Streets);
-            return await AdressdatenItem.ToListAsync();
-        }
-        
-        [HttpGet("City/name={name}")]
-        public async Task<ActionResult<IList<City>>> GetAdressdatenItemName(string name)
-        {
-            var AdressdatenItem = _context.Cities.Where(a => a.Name.ToLower().StartsWith(name)).Include(s => s.Streets);
-            return await AdressdatenItem.ToListAsync();
-        }
-        
-        [HttpGet("Street/postcode={postcode}/street={street}")]
-        public async Task<ActionResult<IList<Street>>> GetStreet(string postcode, string street)
-        {     
-            var AdressdatenItem = _context.Streets.Where(a => a.PostCodeFK.ToString().Contains(postcode) && a.Name.ToLower().StartsWith(street)).Include(s => s.City);
-            return await AdressdatenItem.ToListAsync();
+            if(city.PostCode != 0 && !string.IsNullOrEmpty(city.Name))
+            {
+                return await _context.Cities.Where(c => c.PostCode.ToString().StartsWith(city.PostCode.ToString()) && c.Name.ToLower().StartsWith(city.Name.ToLower())).ToListAsync();
+            } else if (city.PostCode != 0)
+            {
+                return await _context.Cities.Where(c => c.PostCode.ToString().StartsWith(city.PostCode.ToString())).ToListAsync();
+            } else if (!string.IsNullOrEmpty(city.Name))
+            {
+                return await _context.Cities.Where(c => c.Name.ToLower().StartsWith(city.Name.ToLower())).ToListAsync();
+            } else
+            {
+                return new List<City>();
+            }
         }
 
-        [HttpGet("Street/postcode={postcode}")]
-        public async Task<ActionResult<IList<Street>>> GetStreet(string postcode)
+        [HttpGet("Street")]
+        public async Task<ActionResult<IList<Street>>> GetStreet([FromQuery]Street street)
         {
-            var AdressdatenItem = _context.Streets.Where(a => a.PostCodeFK.ToString().Contains(postcode)).Include(s => s.City);
+            var AdressdatenItem = _context.Streets.Where(s => s.PostCodeFK.ToString().Contains(street.PostCodeFK.ToString()) && s.Name.ToLower().StartsWith(street.Name.ToLower()));
             return await AdressdatenItem.ToListAsync();
         }
-
-        [HttpGet("norequest")]
-        public void NoRequest() { }
 
     }
 }
