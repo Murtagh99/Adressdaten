@@ -40,6 +40,14 @@ namespace Adressdaten
             services.AddDbContext<AdressdatenContext>(o => o.UseSqlite(Configuration.GetConnectionString("AdressDb")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(o => { o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore; });
 
+            services.AddCors(o =>
+            {
+                o.AddDefaultPolicy(b =>
+                {
+                    b.AllowAnyOrigin().AllowAnyMethod();
+                });
+            });
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Adressdaten", Version = "v1" });
@@ -57,7 +65,7 @@ namespace Adressdaten
             //{
             //    app.UseHsts();
             //}
-
+            app.UseCors();
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
