@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Adressdaten.Models;
+using Newtonsoft.Json;
+using Adressdaten.Imports;
 using Microsoft.OpenApi.Models;
 
 namespace Adressdaten
@@ -35,13 +37,12 @@ namespace Adressdaten
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<AdressdatenContext>();
+            services.AddDbContext<AdressdatenContext>(o => o.UseSqlite(Configuration.GetConnectionString("AdressDb")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(o => { o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore; });
-            
-            // Register the Swagger generator, defining 1 or more Swagger documents
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Adressdaten", Version = "v1" });
             });
         }
 
@@ -52,21 +53,44 @@ namespace Adressdaten
             {
                 app.UseDeveloperExceptionPage();
             }
-            else
+            //else
+            //{
+            //    app.UseHsts();
+            //}
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
             {
-                app.UseHsts();
-            }
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Adressdaten");
+                c.RoutePrefix = string.Empty;
+            });
 
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseHttpsRedirection();
             app.UseMvc();
 
-            //using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
-            //using (var context = scope.ServiceProvider.GetService<AdressdatenContext>())
+            using (var scope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            using (var dbContext = scope.ServiceProvider.GetService<AdressdatenContext>())
             //{
             //    context.Database.EnsureCreated();
             //}
+            //using (var dbContext = new AdressdatenContext())
+            {
+                dbContext.Database.EnsureCreated();
+                var importedCities = JsonConvert.DeserializeObject<ImportCity[]>(System.IO.File.ReadAllText("Adressen/Cities.json"));
+                if (!dbContext.Cities.Any())
+                {
+                    dbContext.Cities.AddRange(importedCities.Select(city => new City { PostCode = city.PostCode, Name = city.Name }).ToArray());
+                    dbContext.SaveChanges();
+                }
+                if (!dbContext.Streets.Any())
+                {
+                    var streetsImport = importedCities.Select(city => city.Streets.Select(street => new Street { PostCodeFK = city.PostCode, Name = street.Name })).SelectMany(i => i);
+                    dbContext.Streets.AddRange(streetsImport.ToArray());
+                    dbContext.SaveChanges();
+                }
+            }
         }
     }
 }

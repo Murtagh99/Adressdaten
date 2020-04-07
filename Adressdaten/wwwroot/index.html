@@ -6,11 +6,14 @@
     <title>best API ever</title>
 </head>
 <body>
+    <!--test-->
     <!--<label for="inputCity">Plz oder Ort</label>-->
-    <input type="text" id="inputCity" oninput="getAddress(false)" placeholder="Plz oder Ort"/>
+    <input type="text" id="inputcities" oninput="getOptions(false, 'cities')" placeholder="Plz oder Ort" list="cities" onfocus="getOptions(false, 'cities')" />
+    <datalist id="cities"></datalist>
     <!--<label for="inputStreet">Street</label>-->
-    <input type="text" id="inputStreet" oninput="getAddress(true)" placeholder="Strasse"/>
-    
+    <input type="text" id="inputstreets" oninput="getOptions(true, 'streets')" onfocus="getOptions(true, 'streets')" placeholder="Strasse" list="streets" />
+    <datalist id="streets"></datalist>
+
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous"></script>
@@ -18,9 +21,9 @@
     <style>
         body {
             display: flex;
-            flex-direction: column ;
-          
+            flex-direction: column;
         }
+
         input {
             width: 20em;
             border: 2px solid #aaa;
@@ -31,12 +34,11 @@
             box-sizing: border-box;
             transition: .3s
         }
-        input:focus{
-            border-color:dodgerblue;
-            box-shadow:0 0 8px 0 dodgerBlue;
 
-        }
-
+            input:focus {
+                border-color: dodgerblue;
+                box-shadow: 0 0 8px 0 dodgerBlue;
+            }
     </style>
 </body>
 </html>
